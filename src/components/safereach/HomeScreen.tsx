@@ -95,10 +95,13 @@ function AlertHero() {
 }
 
 function PrimaryActions() {
-  const { setView, mode, dismissLanding } = useDemo();
+  const { setView, setMode, mode, dismissLanding } = useDemo();
   const sosPulse = mode === "DISASTER_ACTIVE";
 
   const go = (v: "shelter" | "sos" | "map" | "profile") => {
+    if ((v === "shelter" || v === "sos") && mode === "NORMAL") {
+      setMode("WARNING");
+    }
     setView(v);
     dismissLanding();
   };

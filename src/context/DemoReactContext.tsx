@@ -88,7 +88,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
   const [transportAvailable, setTransportAvailable] = useState(true);
   const [checkedIn, setCheckedIn] = useState(false);
   const [transportConfirmed, setTransportConfirmed] = useState(false);
-  const [landingDismissed, setLandingDismissed] = useState(true);
+  const [landingDismissed, setLandingDismissed] = useState(false);
   const [nwsAlert, setNwsAlert] = useState<NwsAlert>(DEMO_NWS_ALERT);
   const intervalRef = useRef<number | null>(null);
 
@@ -206,7 +206,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     setCheckedIn(false);
     setTransportConfirmed(false);
     setTransportAvailable(true);
-    setLandingDismissed(true);
+    setLandingDismissed(false);
   }, []);
 
   const value = useMemo<DemoContextType>(

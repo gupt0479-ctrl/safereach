@@ -90,7 +90,10 @@ function WarningBanner() {
       role="alert"
       aria-label="Winter storm emergency actions"
       className="absolute inset-x-0 z-[492] border-y border-amber/40 bg-amber px-3 py-2 shadow-xl"
-      style={{ bottom: `calc(64px + 60px + env(safe-area-inset-bottom))` }}
+      style={{
+        bottom: `calc(64px + 60px + env(safe-area-inset-bottom))`,
+        minHeight: 96,
+      }}
     >
       <div className="mx-auto flex max-w-5xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -124,6 +127,11 @@ function WarningBanner() {
 
 function LeftPanel() {
   const [open, setOpen] = useState(true);
+  const { mode } = useDemo();
+  const bannerVisible = isWarningBannerVisible(mode);
+  const panelBottom = bannerVisible
+    ? `calc(64px + 60px + 96px + env(safe-area-inset-bottom))`
+    : `calc(64px + 56px + env(safe-area-inset-bottom))`;
   return (
     <>
       <button
@@ -139,10 +147,10 @@ function LeftPanel() {
       </button>
       <aside
         className={cn(
-          "absolute bottom-0 left-0 top-[120px] z-[480] w-[min(85vw,340px)] overflow-y-auto bg-navy/85 p-3 backdrop-blur-md transition-transform md:w-[300px]",
+          "absolute left-0 top-[120px] z-[480] w-[min(85vw,340px)] overflow-y-auto bg-navy/85 p-3 backdrop-blur-md transition-transform md:w-[300px]",
           open ? "translate-x-0" : "-translate-x-full",
         )}
-        style={{ paddingBottom: 120 }}
+        style={{ bottom: panelBottom, paddingBottom: 12 }}
       >
         <div className="flex flex-col gap-3">
           <AISummaryCard />
