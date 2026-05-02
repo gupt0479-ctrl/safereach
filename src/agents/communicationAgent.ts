@@ -143,7 +143,7 @@ async function callClaude(
 
     const data = await res.json();
     const text = data?.content?.[0]?.text;
-    return typeof text === "string" && text.length > 5 ? text : null;
+    return typeof text === "string" && text.trim().length > 5 ? text.trim() : null;
   } catch {
     return null;
   }
