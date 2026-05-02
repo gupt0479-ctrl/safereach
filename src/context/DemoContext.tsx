@@ -113,12 +113,17 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     (p: Phase) => {
       setModeState("MATCHING");
       setPhase(p);
-      window.setTimeout(() => {
+      window.setTimeout(async () => {
         const result = runMatchingAgent(MARIA, SHELTERS, p);
         setMatchResult(result);
-        const notes = runCommunicationAgent(result, MARIA, CONTACTS, evacuationChoice);
-        setNotifications(notes);
         setModeState("MATCHED");
+        const commResult = await runCommunicationAgent(
+          result,
+          MARIA,
+          CONTACTS,
+          evacuationChoice,
+        );
+        setNotifications(commResult.notifications);
       }, 1500);
     },
     [evacuationChoice],
