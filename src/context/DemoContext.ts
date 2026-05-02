@@ -102,3 +102,6 @@ export function createDemoContext(): DemoContextType {
 
   return ctx;
 }
+
+export { DemoProvider, useDemo, formatCountdown } from './DemoReactContext';
+export type { AppMode, ViewState } from './DemoReactContext';
