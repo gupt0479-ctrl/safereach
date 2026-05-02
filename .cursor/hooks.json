@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": ".cursor/hooks/safereach-context-bootstrap.js",
+        "timeout": 5,
+        "failClosed": false
+      }
+    ],
+    "beforeSubmitPrompt": [
+      {
+        "command": ".cursor/hooks/safereach-prompt-context-gate.js",
+        "matcher": "UserPromptSubmit",
+        "timeout": 5,
+        "failClosed": false
+      }
+    ],
+    "beforeReadFile": [
+      {
+        "command": ".cursor/hooks/safereach-read-context-audit.js",
+        "timeout": 5,
+        "failClosed": false
+      }
+    ],
+    "postToolUse": [
+      {
+        "command": ".cursor/hooks/safereach-edit-review.js",
+        "matcher": "ApplyPatch|Write|Edit|NotebookEdit",
+        "timeout": 5,
+        "failClosed": false
+      }
+    ],
+    "beforeShellExecution": [
+      {
+        "command": ".cursor/hooks/safereach-shell-safety.js",
+        "timeout": 5,
+        "failClosed": false
+      }
+    ],
+    "subagentStart": [
+      {
+        "command": ".cursor/hooks/safereach-subagent-boundary.js",
+        "timeout": 5,
+        "failClosed": false
+      }
+    ],
+    "stop": [
+      {
+        "command": ".cursor/hooks/safereach-stop-reminder.js",
+        "timeout": 5,
+        "failClosed": false,
+        "loop_limit": 1
+      }
+    ]
+  }
+}

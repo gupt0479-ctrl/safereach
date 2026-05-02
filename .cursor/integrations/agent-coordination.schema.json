@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://safereach.local/schemas/agent-coordination.schema.json",
+  "title": "SafeReach Agent Coordination State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contextVersion",
+    "owner",
+    "taskType",
+    "currentFocus",
+    "affectedFiles",
+    "decisions",
+    "verification",
+    "openRisks"
+  ],
+  "properties": {
+    "contextVersion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["prdPath", "deploymentGuidePath", "loadedAt"],
+      "properties": {
+        "prdPath": {
+          "const": ".kiro/context/PRD.md"
+        },
+        "deploymentGuidePath": {
+          "const": ".kiro/context/SafeReach_Deployment_Guide.md"
+        },
+        "loadedAt": {
+          "type": "string"
+        }
+      }
+    },
+    "owner": {
+      "enum": ["cursor", "kiro"]
+    },
+    "taskType": {
+      "enum": ["ui", "refactor", "verification", "heavy-compute", "analysis"]
+    },
+    "currentFocus": {
+      "type": "string"
+    },
+    "affectedFiles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "reference", "summary"],
+        "properties": {
+          "source": {
+            "enum": ["PRD", "DeploymentGuide"]
+          },
+          "reference": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "verification": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["commandOrChecklist", "status"],
+        "properties": {
+          "commandOrChecklist": {
+            "type": "string"
+          },
+          "status": {
+            "enum": ["pending", "passed", "failed", "blocked"]
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openRisks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

@@ -1,0 +1,181 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+@import 'leaflet/dist/leaflet.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* SafeReach Design System
+ * Dark navy base, high contrast, accessibility-first.
+ * All colors HSL.
+ */
+
+@layer base {
+  :root {
+    /* Brand palette */
+    --navy: 214 69% 13%;            /* #0B1F3A */
+    --surface: 215 56% 18%;         /* #132744 */
+    --amber: 35 91% 55%;            /* #F5A623 */
+    --danger: 7 65% 55%;            /* #D94F3D */
+    --safe: 145 63% 49%;            /* #2ECC71 */
+    --info: 217 91% 60%;            /* blue */
+    --muted-text: 211 18% 62%;      /* #8A9BB0 */
+
+    /* Semantic shadcn tokens — keep dark base everywhere */
+    --background: 214 69% 13%;
+    --foreground: 0 0% 100%;
+
+    --card: 215 56% 18%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 215 56% 18%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 145 63% 49%;
+    --primary-foreground: 214 69% 13%;
+
+    --secondary: 215 40% 25%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 215 30% 22%;
+    --muted-foreground: 211 18% 72%;
+
+    --accent: 35 91% 55%;
+    --accent-foreground: 214 69% 13%;
+
+    --destructive: 7 65% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 215 30% 28%;
+    --input: 215 30% 28%;
+    --ring: 35 91% 55%;
+
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html, body, #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  button, a {
+    font-family: inherit;
+  }
+}
+
+/* Mode tints — applied by JS to the root container */
+.mode-warning {
+  background-image: linear-gradient(0deg, hsl(var(--amber) / 0.06), hsl(var(--amber) / 0.06));
+}
+.mode-emergency {
+  background-image: linear-gradient(0deg, hsl(var(--danger) / 0.10), hsl(var(--danger) / 0.10));
+}
+
+/* Pulsing user-location dot */
+@keyframes pulse-ring {
+  0%   { transform: scale(1);   opacity: 0.7; }
+  100% { transform: scale(3);   opacity: 0; }
+}
+.sr-pulse-dot {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: hsl(var(--info));
+  border: 3px solid white;
+  box-shadow: 0 0 0 1px hsl(var(--navy));
+}
+.sr-pulse-dot::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 9999px;
+  background: hsl(var(--info));
+  animation: pulse-ring 1.6s ease-out infinite;
+  z-index: -1;
+}
+.sr-pulse-dot--danger {
+  background: hsl(var(--danger));
+}
+.sr-pulse-dot--danger::before {
+  background: hsl(var(--danger));
+}
+
+@keyframes sos-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--danger) / 0.6), 0 0 0 8px hsl(var(--danger) / 0.25); }
+  50%      { box-shadow: 0 0 0 14px hsl(var(--danger) / 0), 0 0 0 22px hsl(var(--danger) / 0); }
+}
+.animate-sos-pulse {
+  animation: sos-pulse 1.4s ease-out infinite;
+}
+
+/* Map marker bases */
+.sr-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: auto;
+}
+.sr-marker-pin {
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px 9999px 9999px 2px;
+  transform: rotate(-45deg);
+  border: 3px solid white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+.sr-marker-label {
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  background: hsl(var(--navy) / 0.9);
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+/* Leaflet popup styling — match dark theme */
+.leaflet-popup-content-wrapper {
+  background: hsl(var(--surface));
+  color: white;
+  border-radius: 12px;
+  border: 1px solid hsl(var(--border));
+}
+.leaflet-popup-tip {
+  background: hsl(var(--surface));
+}
+.leaflet-popup-content {
+  margin: 12px 14px;
+  font-size: 14px;
+}
+.leaflet-container {
+  background: hsl(var(--navy));
+  font-family: inherit;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 4px; }
+
+/* Utility: card on dark surface */
+.sr-card {
+  background: hsl(var(--surface));
+  border: 1px solid hsl(var(--border));
+  border-radius: 12px;
+}
+.sr-card-light {
+  background: white;
+  color: hsl(var(--navy));
+  border-radius: 12px;
+}

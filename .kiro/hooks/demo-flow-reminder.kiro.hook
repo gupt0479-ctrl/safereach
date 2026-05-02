@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Demo Flow Verification Reminder",
+  "description": "Reminds the agent to verify the demo flow still works after completing all tasks",
+  "version": "1",
+  "when": {
+    "type": "agentStop"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Before finishing, verify the P0 demo flow is intact: 1) Map loads with shelter pins and Maria's dot, 2) Trigger Warning shifts UI and shows banner, 3) Shelter screen shows Phase 1 with explanation card, 4) 2hrs Out shows Phase 1.5 with different content, 5) Storm Active shows Phase 2 with battery countdown, 6) SOS screen shows full SMS card always visible, 7) Reset returns everything to zero. If you made changes that could affect any of these, confirm they still work."
+  }
+}

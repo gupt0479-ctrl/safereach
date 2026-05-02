@@ -1,0 +1,20 @@
+{
+  "enabled": true,
+  "name": "Run Tests on Edit",
+  "description": "Runs the Vitest test suite after any test file is edited to verify tests still pass",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "*.test.ts",
+      "*.test.tsx",
+      "*.spec.ts",
+      "*.spec.tsx"
+    ]
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "npm test 2>&1 | tail -20",
+    "timeout": 60
+  }
+}

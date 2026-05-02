@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "Accessibility Check on Write",
+  "description": "Checks that all SafeReach component files follow accessibility rules before writing them",
+  "version": "1",
+  "when": {
+    "type": "preToolUse",
+    "toolTypes": [
+      "write"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Before writing this file, verify it follows SafeReach accessibility rules: 1) All interactive elements have aria-labels, 2) No color-only communication (pair with icon+text), 3) Minimum tap targets of 48px (min-h-tap), 4) Phone numbers use tel: links, 5) Font sizes meet minimums (16px+), 6) Buttons use min-h-btn (56px) or min-h-btn-lg (64px). If any rule is violated, fix it before writing."
+  }
+}
