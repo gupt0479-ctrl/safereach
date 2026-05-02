@@ -93,7 +93,7 @@ describe('DemoContext — loading state (Requirements 9.1, 9.2, 9.3)', () => {
     await ctx.confirmEvacuation();
 
     expect(ctx.notifications.length).toBeGreaterThan(0);
-    expect(ctx.notifications).toHaveLength(5);
+    expect(ctx.notifications).toHaveLength(6);
   });
 
   it('emergencySMS is populated after the Communication Agent completes', async () => {

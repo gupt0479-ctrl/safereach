@@ -148,7 +148,10 @@ describe("callClaude — tested via runCommunicationAgent", () => {
     );
 
     for (const notification of result.notifications) {
-      expect(notification.message).toBe(expectedText);
+      // notif_emergency_sms has a hardcoded summary message, not the Claude text
+      if (notification.id !== "notif_emergency_sms") {
+        expect(notification.message).toBe(expectedText);
+      }
     }
     expect(result.emergencySMS).toBe(expectedText);
   });

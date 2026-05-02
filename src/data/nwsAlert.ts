@@ -18,3 +18,42 @@ export const DEMO_NWS_ALERT = {
 };
 
 export type NwsAlert = typeof DEMO_NWS_ALERT;
+
+interface NwsFeatureCollection {
+  features?: unknown[];
+}
+
+function isNwsAlert(value: unknown): value is NwsAlert {
+  if (!value || typeof value !== "object") return false;
+  const maybe = value as Partial<NwsAlert>;
+  return (
+    maybe.type === "Feature" &&
+    typeof maybe.properties?.event === "string" &&
+    typeof maybe.properties?.areaDesc === "string"
+  );
+}
+
+/**
+ * Best-effort live NWS alert fetch for Travis County.
+ * Any failure returns the local demo alert so the presentation flow never blocks.
+ */
+export async function fetchActiveNwsAlert(): Promise<NwsAlert> {
+  try {
+    const response = await fetch("https://api.weather.gov/alerts/active?zone=TXZ192", {
+      headers: {
+        Accept: "application/geo+json, application/json",
+      },
+    });
+
+    if (!response.ok) return DEMO_NWS_ALERT;
+
+    const payload = (await response.json()) as NwsFeatureCollection | unknown;
+    const feature = Array.isArray((payload as NwsFeatureCollection).features)
+      ? (payload as NwsFeatureCollection).features?.find(isNwsAlert)
+      : payload;
+
+    return isNwsAlert(feature) ? feature : DEMO_NWS_ALERT;
+  } catch {
+    return DEMO_NWS_ALERT;
+  }
+}

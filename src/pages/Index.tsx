@@ -42,27 +42,27 @@ function GlobalDemoStrip() {
       <button
         onClick={triggerWarning}
         disabled={mode !== "NORMAL"}
-        className="flex-1 rounded-card bg-navy px-2 py-2 text-[12px] font-bold text-white disabled:opacity-50"
+        className="min-h-[48px] flex-1 rounded-card bg-navy px-2 py-2 text-[12px] font-bold text-white disabled:opacity-50"
       >
         🌨 Trigger Warning
       </button>
       <button
         onClick={twoOut}
         disabled={!canFF}
-        className="flex-1 rounded-card bg-navy px-2 py-2 text-[12px] font-bold text-white disabled:opacity-50"
+        className="min-h-[48px] flex-1 rounded-card bg-navy px-2 py-2 text-[12px] font-bold text-white disabled:opacity-50"
       >
         ⏩ 2hrs Out
       </button>
       <button
         onClick={stormActive}
         disabled={!canStorm}
-        className="flex-1 rounded-card bg-danger px-2 py-2 text-[12px] font-bold text-white disabled:opacity-50"
+        className="min-h-[48px] flex-1 rounded-card bg-danger px-2 py-2 text-[12px] font-bold text-white disabled:opacity-50"
       >
         ⚡ Storm Active
       </button>
       <button
         onClick={reset}
-        className="rounded-card bg-navy/40 px-2 py-2 text-[12px] font-bold text-white"
+        className="min-h-[48px] min-w-[48px] rounded-card bg-navy/40 px-2 py-2 text-[12px] font-bold text-white"
         aria-label="Reset demo"
       >
         ↺

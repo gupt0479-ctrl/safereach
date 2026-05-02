@@ -74,14 +74,14 @@ describe("runCommunicationAgent", () => {
     vi.restoreAllMocks();
   });
 
-  it("returns exactly 5 notifications", async () => {
+  it("returns exactly 6 notifications", async () => {
     const result = await runCommunicationAgent(
       testMatch,
       testUser,
       CONTACTS,
       "confirmed",
     );
-    expect(result.notifications).toHaveLength(5);
+    expect(result.notifications).toHaveLength(6);
   });
 
   it('sets notif_oem.status to "escalated" when evacuationChoice is "cannot"', async () => {

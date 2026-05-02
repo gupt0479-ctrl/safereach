@@ -81,7 +81,7 @@ export function createDemoContext(): DemoContextType {
       state.mode = 'MATCHING';
       state.isGeneratingNotifications = true;
 
-      const match = runMatchingAgent(MARIA, SHELTERS, 1);
+      const match = await runMatchingAgent(MARIA, SHELTERS, 1);
       state.matchResult = match;
       state.mode = 'MATCHED';
 

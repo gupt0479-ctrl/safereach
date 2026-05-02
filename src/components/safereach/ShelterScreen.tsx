@@ -1,6 +1,6 @@
 import { useDemo } from "@/context/DemoContext";
 import { MARIA, SHELTERS } from "@/data/demo";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronDown, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -95,7 +95,9 @@ function OtherShelters() {
     <div>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between rounded-card border border-border bg-surface px-4 py-3 text-left text-[14px] font-semibold text-muted-foreground"
+        className="flex min-h-[48px] w-full items-center justify-between rounded-card border border-border bg-surface px-4 py-3 text-left text-[14px] font-semibold text-muted-foreground"
+        aria-expanded={open}
+        aria-label={open ? "Hide other evaluated shelters" : "Show other evaluated shelters"}
       >
         <span>▾ 4 other shelters evaluated</span>
         <ChevronDown
@@ -181,7 +183,8 @@ function Phase1() {
         </div>
         <a
           href="tel:5125550311"
-          className="mt-1 block text-[22px] font-bold text-amber"
+          className="mt-1 inline-flex min-h-[48px] items-center text-[22px] font-bold text-amber"
+          aria-label="Call shelter direct line at (512) 555-0311"
         >
           (512) 555-0311
         </a>
@@ -222,8 +225,10 @@ function Phase15() {
             </span>
             <button
               onClick={() => setTransportCut((v) => !v)}
+              aria-pressed={transportCut}
+              aria-label="Toggle simulated transport unavailable state"
               className={cn(
-                "rounded-full px-3 py-1 text-[13px] font-bold",
+                "min-h-[48px] min-w-[64px] rounded-full px-3 py-1 text-[13px] font-bold",
                 transportCut ? "bg-danger text-white" : "bg-white/10 text-white",
               )}
             >
@@ -260,14 +265,17 @@ function Phase15() {
               </WhyCard>
 
               <section className="rounded-card bg-surface p-4">
-                <p className="text-[20px] font-bold text-amber">
-                  🚐 ADA van ETA: 1 hour 45 minutes
+                <p className="text-[22px] font-bold text-amber">
+                  🚐 ADA van ETA: 1h 45min
                 </p>
                 <p className="mt-1 text-[15px] text-amber">
                   Your transport window closes in approximately 30 minutes.
                 </p>
-                <button className="mt-3 min-h-btn w-full rounded-card bg-safe px-4 font-bold text-navy">
-                  ✓ I'm Ready — Confirm Pickup
+                <button
+                  type="button"
+                  className="mt-3 min-h-btn w-full rounded-card bg-safe px-4 font-bold text-navy"
+                >
+                  ✓ I'm Ready — Confirm Pickup Now
                 </button>
               </section>
 
@@ -302,9 +310,81 @@ function BatteryRow({
   );
 }
 
+function formatBatteryTime(totalSeconds: number) {
+  const safeSeconds = Math.max(0, totalSeconds);
+  const hours = Math.floor(safeSeconds / 3600);
+  const minutes = Math.floor((safeSeconds % 3600) / 60);
+  const seconds = safeSeconds % 60;
+
+  return `${hours}h ${String(minutes).padStart(2, "0")}m ${String(seconds).padStart(2, "0")}s remaining`;
+}
+
+function FormulaMetric({
+  label,
+  percent,
+  tone,
+}: {
+  label: string;
+  percent: number;
+  tone: "danger" | "amber" | "info" | "safe";
+}) {
+  const toneClass = {
+    danger: "bg-danger",
+    amber: "bg-amber",
+    info: "bg-info",
+    safe: "bg-safe",
+  }[tone];
+
+  return (
+    <div>
+      <div className="mb-1 flex items-center justify-between gap-3">
+        <span className="text-[15px] font-bold text-white">{label}</span>
+        <span className="text-[16px] font-black text-white">{percent}%</span>
+      </div>
+      <div
+        className="h-3 w-full overflow-hidden rounded-full bg-white/10"
+        aria-label={`${label} contributes ${percent} percent`}
+      >
+        <div className={cn("h-full rounded-full", toneClass)} style={{ width: `${percent}%` }} />
+      </div>
+    </div>
+  );
+}
+
+function Phase2FormulaCard() {
+  return (
+    <div className="rounded-card border border-white/10 bg-surface p-4">
+      <div className="mb-2 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+        Phase 2 Triage Formula
+      </div>
+      <p className="mb-4 text-[15px] text-white">
+        Survival mode prioritizes emergency dispatch, not shelter search.
+      </p>
+      <div className="space-y-3">
+        <FormulaMetric label="Equipment urgency" percent={35} tone="danger" />
+        <FormulaMetric label="Disability tier" percent={30} tone="amber" />
+        <FormulaMetric label="Last check-in" percent={20} tone="info" />
+        <FormulaMetric label="Nearby resources" percent={15} tone="safe" />
+      </div>
+    </div>
+  );
+}
+
 function Phase2() {
   const { checkedIn, setCheckedIn, transportConfirmed } = useDemo();
   const stranded = !transportConfirmed;
+  const [ventilatorSeconds, setVentilatorSeconds] = useState(5 * 60 * 60 + 52 * 60);
+  const [wheelchairSeconds, setWheelchairSeconds] = useState(3 * 60 * 60 + 20 * 60);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setVentilatorSeconds((seconds) => Math.max(0, seconds - 1));
+      setWheelchairSeconds((seconds) => Math.max(0, seconds - 1));
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
   return (
     <>
       <div className="rounded-card border border-danger bg-danger/20 p-4">
@@ -335,7 +415,7 @@ function Phase2() {
             label="Ventilator"
             pct={78}
             color="hsl(var(--amber))"
-            time="~5 hours 52 minutes remaining"
+            time={formatBatteryTime(ventilatorSeconds)}
             warn="⚠ Connect to backup power source immediately if available."
           />
           <BatteryRow
@@ -343,7 +423,7 @@ function Phase2() {
             label="Power Wheelchair"
             pct={45}
             color="hsl(var(--safe))"
-            time="~3 hours 20 minutes remaining"
+            time={formatBatteryTime(wheelchairSeconds)}
           />
         </div>
         <p className="mt-3 text-[13px] text-muted-foreground">
@@ -353,11 +433,10 @@ function Phase2() {
 
       <div className="rounded-card bg-surface p-4">
         <div className="mb-2 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
-          Current Match — Disaster Mode
+          Shelter Status — Disaster Mode
         </div>
         <p className="mb-3 text-[14px] text-muted-foreground">
-          Match formula has shifted to: Equipment urgency 35% · Disability
-          tier 30% · Last check-in 20% · Nearby resources 15%
+          Dell Seton remains the confirmed safe power location while emergency services track Maria's status.
         </p>
         <div className="rounded-card border border-safe/40 bg-navy p-3">
           <div className="flex items-center justify-between gap-2">
@@ -376,6 +455,8 @@ function Phase2() {
         </div>
       </div>
 
+      <Phase2FormulaCard />
+
       {stranded ? (
         <div className="rounded-card border border-danger bg-danger/15 p-4">
           <p className="text-[18px] font-bold text-danger">
@@ -387,7 +468,10 @@ function Phase2() {
           <p className="text-[14px] text-white">
             Welfare check dispatched — ETA ~22 minutes
           </p>
-          <button className="mt-3 min-h-btn w-full rounded-card bg-danger px-4 font-bold text-white">
+          <button
+            type="button"
+            className="mt-3 min-h-btn w-full rounded-card bg-danger px-4 font-bold text-white"
+          >
             Send My Location Again
           </button>
         </div>

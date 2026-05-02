@@ -33,7 +33,15 @@ function MapHeader() {
   const { mode, countdown } = useDemo();
   const showTimer = mode !== "NORMAL";
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 z-[500] flex items-start justify-between gap-3 bg-gradient-to-b from-navy via-navy/85 to-transparent px-4 pb-4 pt-3">
+    <div
+      className="pointer-events-none absolute inset-x-0 top-0 z-[500] flex min-h-[72px] items-center justify-between gap-3 px-4 py-3"
+      style={{
+        background: "rgba(11, 31, 58, 0.92)",
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
+        borderBottom: "1px solid rgba(255,255,255,0.06)",
+      }}
+    >
       <div className="pointer-events-auto flex items-center gap-2">
         <span className="grid h-9 w-9 place-items-center rounded-lg bg-safe/15">
           <Shield className="h-5 w-5 text-safe" aria-hidden />
@@ -62,7 +70,52 @@ function MapHeader() {
 }
 
 function WarningBanner() {
-  return null;
+  const { mode, setView } = useDemo();
+  const visibleModes = new Set([
+    "WARNING",
+    "MATCHING",
+    "MATCHED",
+    "EVACUATING",
+    "CANNOT_EVACUATE",
+    "DISASTER_ACTIVE",
+  ]);
+
+  if (!visibleModes.has(mode)) return null;
+
+  return (
+    <section
+      role="alert"
+      aria-label="Winter storm emergency actions"
+      className="absolute inset-x-0 top-[72px] z-[499] border-b border-amber/40 bg-amber px-4 py-3 shadow-xl"
+    >
+      <div className="mx-auto flex max-w-5xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-[20px] font-black leading-tight text-navy sm:text-[24px]">
+            Winter Storm Warning Active
+          </p>
+          <p className="mt-1 text-[16px] font-bold leading-snug text-navy">
+            Maria needs backup power and accessible transport.
+          </p>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-2">
+          <button
+            type="button"
+            onClick={() => setView("shelter")}
+            className="min-h-[56px] rounded-card bg-navy px-5 text-[18px] font-black text-white shadow-md"
+          >
+            Get to Safety
+          </button>
+          <button
+            type="button"
+            onClick={() => setView("sos")}
+            className="min-h-[56px] rounded-card bg-danger px-5 text-[18px] font-black text-white shadow-md"
+          >
+            S.O.S
+          </button>
+        </div>
+      </div>
+    </section>
+  );
 }
 
 function LeftPanel() {
@@ -73,7 +126,7 @@ function LeftPanel() {
         onClick={() => setOpen((o) => !o)}
         aria-label={open ? "Collapse details panel" : "Expand details panel"}
         className={cn(
-          "absolute z-[490] grid h-10 w-8 place-items-center rounded-r-card bg-surface text-white shadow-lg ring-1 ring-white/10 transition-all md:hidden",
+          "absolute z-[490] grid h-12 w-12 place-items-center rounded-r-card bg-surface text-white shadow-lg ring-1 ring-white/10 transition-all md:hidden",
           open ? "left-[calc(min(85vw,340px))]" : "left-0",
         )}
         style={{ top: "55%" }}
@@ -128,27 +181,27 @@ function DemoStrip() {
       <button
         onClick={triggerWarning}
         disabled={mode !== "NORMAL"}
-        className="flex-1 rounded-card bg-navy px-2 py-2 text-[12px] font-bold text-white disabled:opacity-50"
+        className="min-h-[48px] flex-1 rounded-card bg-navy px-2 py-2 text-[12px] font-bold text-white disabled:opacity-50"
       >
         🌨 Trigger Warning
       </button>
       <button
         onClick={twoOut}
         disabled={!canFF}
-        className="flex-1 rounded-card bg-navy px-2 py-2 text-[12px] font-bold text-white disabled:opacity-50"
+        className="min-h-[48px] flex-1 rounded-card bg-navy px-2 py-2 text-[12px] font-bold text-white disabled:opacity-50"
       >
         ⏩ 2hrs Out
       </button>
       <button
         onClick={stormActive}
         disabled={!canStorm}
-        className="flex-1 rounded-card bg-danger px-2 py-2 text-[12px] font-bold text-white disabled:opacity-50"
+        className="min-h-[48px] flex-1 rounded-card bg-danger px-2 py-2 text-[12px] font-bold text-white disabled:opacity-50"
       >
         ⚡ Storm Active
       </button>
       <button
         onClick={reset}
-        className="rounded-card bg-navy/40 px-2 py-2 text-[12px] font-bold text-white"
+        className="min-h-[48px] min-w-[48px] rounded-card bg-navy/40 px-2 py-2 text-[12px] font-bold text-white"
         aria-label="Reset demo"
       >
         ↺

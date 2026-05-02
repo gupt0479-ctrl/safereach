@@ -16,8 +16,14 @@ import {
 } from "@/agents/matchingAgent";
 import {
   runCommunicationAgent,
+  type CommunicationResult,
   type Notification,
 } from "@/agents/communicationAgent";
+import {
+  DEMO_NWS_ALERT,
+  fetchActiveNwsAlert,
+  type NwsAlert,
+} from "@/data/nwsAlert";
 
 export type AppMode =
   | "NORMAL"
@@ -38,6 +44,9 @@ interface DemoContextType {
   countdown: number;
   matchResult: MatchResult | null;
   notifications: Notification[];
+  communicationResult: CommunicationResult | null;
+  emergencySMS: string | null;
+  generatingNotifications: boolean;
   evacuationChoice: "confirmed" | "cannot" | null;
   setEvacuationChoice: (c: "confirmed" | "cannot") => void;
   runMatch: (phase: Phase) => void;
@@ -55,6 +64,7 @@ interface DemoContextType {
   appendNotification: (n: Notification) => void;
   landingDismissed: boolean;
   dismissLanding: () => void;
+  nwsAlert: NwsAlert;
 }
 
 const DemoContext = createContext<DemoContextType | null>(null);
@@ -67,6 +77,9 @@ export function DemoProvider({ children }: { children: ReactNode }) {
   const [countdown, setCountdown] = useState(INITIAL_COUNTDOWN);
   const [matchResult, setMatchResult] = useState<MatchResult | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [communicationResult, setCommunicationResult] = useState<CommunicationResult | null>(null);
+  const [emergencySMS, setEmergencySMS] = useState<string | null>(null);
+  const [generatingNotifications, setGeneratingNotifications] = useState(false);
   const [evacuationChoice, setEvacuationChoiceState] = useState<
     "confirmed" | "cannot" | null
   >(null);
@@ -76,9 +89,20 @@ export function DemoProvider({ children }: { children: ReactNode }) {
   const [checkedIn, setCheckedIn] = useState(false);
   const [transportConfirmed, setTransportConfirmed] = useState(false);
   const [landingDismissed, setLandingDismissed] = useState(true);
+  const [nwsAlert, setNwsAlert] = useState<NwsAlert>(DEMO_NWS_ALERT);
   const intervalRef = useRef<number | null>(null);
 
   const dismissLanding = useCallback(() => setLandingDismissed(true), []);
+
+  useEffect(() => {
+    let active = true;
+    fetchActiveNwsAlert().then((alert) => {
+      if (active) setNwsAlert(alert);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const setMode = useCallback((m: AppMode) => {
     setModeState(m);
@@ -113,17 +137,28 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     (p: Phase) => {
       setModeState("MATCHING");
       setPhase(p);
-      window.setTimeout(async () => {
-        const result = runMatchingAgent(MARIA, SHELTERS, p);
-        setMatchResult(result);
-        setModeState("MATCHED");
-        const commResult = await runCommunicationAgent(
-          result,
-          MARIA,
-          CONTACTS,
-          evacuationChoice,
-        );
-        setNotifications(commResult.notifications);
+      setGeneratingNotifications(true);
+
+      // Preserve the existing 1.5s matching demo delay
+      window.setTimeout(() => {
+        (async () => {
+          try {
+            const result = await runMatchingAgent(MARIA, SHELTERS, p);
+            setMatchResult(result);
+            setModeState("MATCHED");
+
+            // Run communication agent (async, may take time for Claude calls)
+            const commResult = await runCommunicationAgent(result, MARIA, CONTACTS, evacuationChoice);
+            setNotifications(commResult.notifications);
+            setCommunicationResult(commResult);
+            setEmergencySMS(commResult.emergencySMS);
+          } catch {
+            // If everything fails, still transition to MATCHED with no notifications
+            setModeState("MATCHED");
+          } finally {
+            setGeneratingNotifications(false);
+          }
+        })();
       }, 1500);
     },
     [evacuationChoice],
@@ -162,6 +197,9 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     setCountdown(INITIAL_COUNTDOWN);
     setMatchResult(null);
     setNotifications([]);
+    setCommunicationResult(null);
+    setEmergencySMS(null);
+    setGeneratingNotifications(false);
     setEvacuationChoiceState(null);
     setView("map");
     setSmsSent(false);
@@ -180,6 +218,9 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       countdown,
       matchResult,
       notifications,
+      communicationResult,
+      emergencySMS,
+      generatingNotifications,
       evacuationChoice,
       setEvacuationChoice,
       runMatch,
@@ -197,12 +238,14 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       appendNotification,
       landingDismissed,
       dismissLanding,
+      nwsAlert,
     }),
     [
       mode, setMode, phase, countdown, matchResult, notifications,
+      communicationResult, emergencySMS, generatingNotifications,
       evacuationChoice, setEvacuationChoice, runMatch, view, reset,
       smsSent, sendSos, transportAvailable, checkedIn, transportConfirmed,
-      appendNotification, landingDismissed, dismissLanding,
+      appendNotification, landingDismissed, dismissLanding, nwsAlert,
     ],
   );
 
