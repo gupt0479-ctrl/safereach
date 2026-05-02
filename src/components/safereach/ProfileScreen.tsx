@@ -3,12 +3,51 @@ import { CONTACTS, MARIA, OEM_REFERENCE } from "@/data/demo";
 import { useDemo } from "@/context/DemoContext";
 import { cn } from "@/lib/utils";
 
-const EQUIPMENT = [
-  { icon: "🫁", label: "Ventilator", sub: "Electricity required 24/7", subCls: "text-danger" },
-  { icon: "♿", label: "Power Wheelchair", sub: "Electricity required", subCls: "text-muted-foreground" },
-  { icon: "🚗", label: "Cannot Self-Evacuate", sub: "ADA transport required", subCls: "text-amber" },
-  { icon: "💬", label: "Large Text Alerts", sub: "No audio-only notifications", subCls: "text-muted-foreground" },
-];
+const EQUIPMENT_META: Record<string, { icon: string; label: string; sub: string; subCls: string }> = {
+  ventilator: {
+    icon: "🫁",
+    label: "Ventilator",
+    sub: "Electricity required 24/7",
+    subCls: "text-danger",
+  },
+  power_wheelchair: {
+    icon: "♿",
+    label: "Power Wheelchair",
+    sub: "Electricity required",
+    subCls: "text-muted-foreground",
+  },
+};
+
+function buildEquipmentGrid() {
+  const equipment = MARIA.equipment.map((id) => (
+    EQUIPMENT_META[id] ?? {
+      icon: "⚕",
+      label: id.replace(/_/g, " "),
+      sub: "Medical equipment",
+      subCls: "text-muted-foreground",
+    }
+  ));
+
+  if (!MARIA.canSelfEvacuate) {
+    equipment.push({
+      icon: "🚗",
+      label: "Cannot Self-Evacuate",
+      sub: MARIA.requiresAccessibleTransport ? "ADA transport required" : "Transport assistance required",
+      subCls: "text-amber",
+    });
+  }
+
+  if (MARIA.commMode === "large_text") {
+    equipment.push({
+      icon: "💬",
+      label: "Large Text Alerts",
+      sub: "No audio-only notifications",
+      subCls: "text-muted-foreground",
+    });
+  }
+
+  return equipment;
+}
 
 function Toggle({ on, label }: { on: boolean; label: string }) {
   return (
@@ -46,7 +85,8 @@ function ContactCard({
       <p className="text-[14px] text-muted-foreground">{role}</p>
       <a
         href={`tel:${phone.replace(/\D/g, "")}`}
-        className="mt-1 block text-[16px] font-bold text-amber"
+        className="mt-1 inline-flex min-h-[48px] items-center text-[16px] font-bold text-amber"
+        aria-label={`Call ${name} at ${phone}`}
       >
         {phone}
       </a>
@@ -67,7 +107,11 @@ function ContactCard({
         >
           Call {name.split(" ")[0]}
         </a>
-        <button className="flex min-h-tap items-center justify-center rounded-card border border-white/30 px-3 text-[14px] font-bold text-white">
+        <button
+          type="button"
+          className="flex min-h-tap items-center justify-center rounded-card border border-white/30 px-3 text-[14px] font-bold text-white"
+          aria-label={`Send update to ${name}`}
+        >
           Send Update
         </button>
       </div>
@@ -76,8 +120,9 @@ function ContactCard({
 }
 
 export function ProfileScreen() {
-  const { notifications, mode } = useDemo();
+  const { notifications, mode, generatingNotifications } = useDemo();
   const notifiedAll = mode !== "NORMAL" && notifications.length > 0;
+  const equipment = buildEquipmentGrid();
 
   return (
     <div className="flex flex-col gap-4 px-4 pb-8 pt-4">
@@ -116,7 +161,7 @@ export function ProfileScreen() {
           My Equipment & Needs
         </h2>
         <div className="grid grid-cols-2 gap-3">
-          {EQUIPMENT.map((e) => (
+          {equipment.map((e) => (
             <div key={e.label} className="rounded-card bg-navy p-4 ring-1 ring-white/10">
               <div className="text-[20px]">{e.icon}</div>
               <div className="mt-1 text-[16px] font-bold text-white">{e.label}</div>
@@ -163,7 +208,11 @@ export function ProfileScreen() {
               notified={notifiedAll}
             />
           ))}
-          <button className="min-h-[48px] w-full rounded-card border border-amber bg-amber/10 px-4 font-bold text-amber">
+          <button
+            type="button"
+            className="min-h-[48px] w-full rounded-card border border-amber bg-amber/10 px-4 font-bold text-amber"
+            aria-label="Add emergency contact, visual placeholder only"
+          >
             + Add Emergency Contact
           </button>
         </div>
@@ -172,13 +221,26 @@ export function ProfileScreen() {
           <h3 className="mb-2 text-[12px] font-bold uppercase tracking-wide text-muted-foreground">
             Recent Notifications Sent
           </h3>
-          {notifications.length === 0 ? (
+          {generatingNotifications ? (
+            <div
+              className="rounded-card border border-amber bg-amber/10 p-3"
+              role="status"
+              aria-label="Generating notifications"
+            >
+              <p className="text-[14px] font-bold text-amber">
+                ⏳ Generating notifications...
+              </p>
+              <p className="mt-1 text-[13px] text-muted-foreground">
+                AI is creating personalized alerts for your contacts, shelter, and emergency services.
+              </p>
+            </div>
+          ) : notifications.length === 0 ? (
             <p className="rounded-card border border-dashed border-border bg-surface p-3 text-[14px] text-muted-foreground">
               Notifications will appear here when an alert is active.
             </p>
           ) : (
             <ul className="space-y-2">
-              {notifications.slice(0, 5).map((n) => (
+              {notifications.map((n) => (
                 <li key={n.id} className="rounded-card bg-surface p-3">
                   <div className="flex items-center justify-between text-[13px]">
                     <span className="font-mono font-bold text-white">{n.timestamp}</span>
