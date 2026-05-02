@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Codex artifacts
+browser-smoke-*.png
+dev-server.log
+
+# Bun (using npm)
+bun.lockb

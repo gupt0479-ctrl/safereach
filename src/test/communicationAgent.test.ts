@@ -9,8 +9,8 @@ describe("communicationAgent", () => {
   describe("confirmed evacuation", () => {
     const notifications = runCommunicationAgent(match, MARIA, CONTACTS, "confirmed");
 
-    it("should generate 4 notifications", () => {
-      expect(notifications.length).toBe(4);
+    it("should generate 5 notifications (user + 2 contacts + shelter + OEM)", () => {
+      expect(notifications.length).toBe(5);
     });
 
     it("should notify the user first", () => {
@@ -63,8 +63,8 @@ describe("communicationAgent", () => {
   describe("null evacuation choice", () => {
     const notifications = runCommunicationAgent(match, MARIA, CONTACTS, null);
 
-    it("should still generate 4 notifications", () => {
-      expect(notifications.length).toBe(4);
+    it("should still generate 5 notifications", () => {
+      expect(notifications.length).toBe(5);
     });
 
     it("should send OEM confirmation (default path)", () => {
