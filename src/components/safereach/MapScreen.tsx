@@ -91,7 +91,7 @@ function WarningBanner() {
       aria-label="Winter storm emergency actions"
       className="absolute inset-x-0 z-[492] border-y border-amber/40 bg-amber px-3 py-2 shadow-xl"
       style={{
-        bottom: `calc(64px + 60px + env(safe-area-inset-bottom))`,
+        bottom: 60,
         minHeight: 96,
       }}
     >
@@ -129,9 +129,7 @@ function LeftPanel() {
   const [open, setOpen] = useState(true);
   const { mode } = useDemo();
   const bannerVisible = isWarningBannerVisible(mode);
-  const panelBottom = bannerVisible
-    ? `calc(64px + 60px + 96px + env(safe-area-inset-bottom))`
-    : `calc(64px + 56px + env(safe-area-inset-bottom))`;
+  const panelBottom = bannerVisible ? 156 : 56;
   return (
     <>
       <button
@@ -188,7 +186,7 @@ function DemoStrip() {
   return (
     <div
       className="absolute inset-x-0 z-[490] flex items-center gap-1 bg-amber/95 px-2 py-1.5"
-      style={{ bottom: `calc(64px + env(safe-area-inset-bottom))`, minHeight: 48 }}
+      style={{ bottom: 0, minHeight: 48 }}
     >
       <button
         onClick={triggerWarning}
@@ -236,9 +234,7 @@ function FloatingSos() {
       )}
       style={{
         right: 16,
-        bottom: bannerVisible
-          ? `calc(64px + 60px + 96px + env(safe-area-inset-bottom))`
-          : `calc(64px + 56px + env(safe-area-inset-bottom))`,
+        bottom: bannerVisible ? 172 : 72,
       }}
     >
       <Siren className="h-7 w-7" aria-hidden />
