@@ -5,11 +5,9 @@ import {
   TileLayer,
   Marker,
   Tooltip,
-  Circle,
   useMap,
 } from "react-leaflet";
 import { MARIA, SHELTERS, CONTACTS, type Shelter } from "@/data/demo";
-import { EMPOWER_ZIPS, EMPOWER_TOTAL_COUNTY, EMPOWER_SOURCE } from "@/data/zipOverlay";
 import { scoreShelterForMap } from "@/agents/matchingAgent";
 import { useDemo } from "@/context/DemoContext";
 
@@ -82,26 +80,6 @@ export function MapView() {
       <FixSize />
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-      {EMPOWER_ZIPS.map((z) => (
-        <Circle
-          key={z.zip}
-          center={[z.lat, z.lng]}
-          radius={Math.max(900, z.count * 5)}
-          pathOptions={{
-            color: "hsl(var(--amber))",
-            fillColor: "hsl(var(--amber))",
-            fillOpacity: isDisaster ? 0.36 : 0.2,
-            weight: 1,
-          }}
-        >
-          <Tooltip>
-            <strong>ZIP {z.zip}</strong>
-            <br />
-            {z.count} electricity-dependent residents
-          </Tooltip>
-        </Circle>
-      ))}
-
       {SHELTERS.map((s: Shelter) => {
         const score = scoreShelterForMap(MARIA, s);
         return (
@@ -142,32 +120,5 @@ export function MapView() {
         </Tooltip>
       </Marker>
     </MapContainer>
-  );
-}
-
-/** emPOWER legend overlay — positioned by MapScreen */
-export function EmPOWERLegend() {
-  return (
-    <div className="rounded-card bg-navy/90 p-3 backdrop-blur-sm ring-1 ring-white/10" style={{ maxWidth: 220 }}>
-      <div className="mb-1 text-[11px] font-bold uppercase tracking-widest text-amber">
-        ⚡ emPOWER Data
-      </div>
-      <div className="flex items-center gap-2">
-        <span
-          className="inline-block h-3 w-3 rounded-full"
-          style={{ background: "hsl(var(--amber))", opacity: 0.5 }}
-          aria-hidden
-        />
-        <span className="text-[13px] text-white">
-          Electricity-dependent residents
-        </span>
-      </div>
-      <p className="mt-1 text-[12px] text-muted-foreground">
-        Travis County: {EMPOWER_TOTAL_COUNTY.toLocaleString()}+ total
-      </p>
-      <p className="text-[11px] italic text-muted-foreground">
-        {EMPOWER_SOURCE}
-      </p>
-    </div>
   );
 }

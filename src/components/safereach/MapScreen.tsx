@@ -1,6 +1,6 @@
 import { Shield, Siren } from "lucide-react";
 import { useDemo, formatCountdown } from "@/context/DemoContext";
-import { MapView, EmPOWERLegend } from "./MapView";
+import { MapView } from "./MapView";
 import { AISummaryCard, ActiveAlertCard, HelpStatusCard } from "./MapPanels";
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -69,31 +69,35 @@ function MapHeader() {
   );
 }
 
+function isWarningBannerVisible(mode: string): boolean {
+  return (
+    mode === "WARNING" ||
+    mode === "MATCHING" ||
+    mode === "MATCHED" ||
+    mode === "EVACUATING" ||
+    mode === "CANNOT_EVACUATE" ||
+    mode === "DISASTER_ACTIVE"
+  );
+}
+
 function WarningBanner() {
   const { mode, setView } = useDemo();
-  const visibleModes = new Set([
-    "WARNING",
-    "MATCHING",
-    "MATCHED",
-    "EVACUATING",
-    "CANNOT_EVACUATE",
-    "DISASTER_ACTIVE",
-  ]);
 
-  if (!visibleModes.has(mode)) return null;
+  if (!isWarningBannerVisible(mode)) return null;
 
   return (
     <section
       role="alert"
       aria-label="Winter storm emergency actions"
-      className="absolute inset-x-0 top-[72px] z-[499] border-b border-amber/40 bg-amber px-4 py-3 shadow-xl"
+      className="absolute inset-x-0 z-[492] border-y border-amber/40 bg-amber px-3 py-2 shadow-xl"
+      style={{ bottom: `calc(64px + 60px + env(safe-area-inset-bottom))` }}
     >
-      <div className="mx-auto flex max-w-5xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mx-auto flex max-w-5xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-[20px] font-black leading-tight text-navy sm:text-[24px]">
+          <p className="text-[18px] font-black leading-tight text-navy sm:text-[22px]">
             Winter Storm Warning Active
           </p>
-          <p className="mt-1 text-[16px] font-bold leading-snug text-navy">
+          <p className="mt-0.5 text-[15px] font-bold leading-snug text-navy">
             Maria needs backup power and accessible transport.
           </p>
         </div>
@@ -213,6 +217,7 @@ function DemoStrip() {
 function FloatingSos() {
   const { setView, mode } = useDemo();
   const pulsing = mode === "DISASTER_ACTIVE";
+  const bannerVisible = isWarningBannerVisible(mode);
   return (
     <button
       onClick={() => setView("sos")}
@@ -223,7 +228,9 @@ function FloatingSos() {
       )}
       style={{
         right: 16,
-        bottom: `calc(64px + 56px + env(safe-area-inset-bottom))`,
+        bottom: bannerVisible
+          ? `calc(64px + 60px + 96px + env(safe-area-inset-bottom))`
+          : `calc(64px + 56px + env(safe-area-inset-bottom))`,
       }}
     >
       <Siren className="h-7 w-7" aria-hidden />
@@ -239,13 +246,6 @@ export function MapScreen() {
       <MapHeader />
       <WarningBanner />
       <LeftPanel />
-      {/* emPOWER legend — bottom-left */}
-      <div
-        className="absolute z-[480]"
-        style={{ left: 12, bottom: `calc(64px + 56px + env(safe-area-inset-bottom))` }}
-      >
-        <EmPOWERLegend />
-      </div>
       <DemoStrip />
       <FloatingSos />
     </div>
